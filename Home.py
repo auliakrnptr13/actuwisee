@@ -94,7 +94,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Sidebar Navigasi Otomatis (Akan menyesuaikan Laptop / HP)
 def render_sidebar():
     st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
     st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
