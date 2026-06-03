@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# 2. Fungsi Sidebar Navigasi Resmi Streamlit
+# 2. Fungsi Sidebar Navigasi (Disamakan Persis dengan Nama File di GitHub Kamu)
 def render_sidebar():
     st.sidebar.title("ActuWise")
     st.sidebar.caption("Smart Actuarial Platform")
@@ -17,8 +17,8 @@ def render_sidebar():
     
     st.sidebar.subheader("Menu Navigasi")
     st.sidebar.page_link("Home.py", label="Dashboard Utama", icon=":material/monitoring:")
-    st.sidebar.page_link("pages/Premium_Calculator.py", label="Kalkulator Premi", icon=":material/calculate:")
-    st.sidebar.page_link("pages/Mortality_Analytics.py", label="Analisis Mortalitas", icon=":material/analytics:")
+    st.sidebar.page_link("pages/Premi.py", label="Kalkulator Premi", icon=":material/calculate:")
+    st.sidebar.page_link("pages/Mortalitas.py", label="Analisis Mortalitas", icon=":material/analytics:")
     st.sidebar.page_link("pages/Life_Expectancy.py", label="Angka Harapan Hidup", icon=":material/hourglass_empty:")
     st.sidebar.page_link("pages/Insurance_Gap.py", label="Analisis Celah Proteksi", icon=":material/shield:")
     st.sidebar.page_link("pages/About.py", label="Tentang Aplikasi", icon=":material/info:")
