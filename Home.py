@@ -92,11 +92,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.page_link(
-    "pages/1_Dashboard.py",
-    label="🚀 Enter Dashboard",
-    use_container_width=True
-)
+if st.button("🚀 Enter Dashboard", use_container_width=True):
+    st.switch_page("pages/1_Dashboard.py")
 
 st.write("")
 st.write("")
