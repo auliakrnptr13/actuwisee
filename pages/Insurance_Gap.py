@@ -1,203 +1,47 @@
-
 import streamlit as st
-import plotly.graph_objects as go
 
-# =========================
-# PAGE CONFIG
-# =========================
-st.set_page_config(
-    page_title="Insurance Gap",
-    page_icon="🛡️",
-    layout="wide"
-)
+st.set_page_config(page_title="Insurance Gap - ActuWise", layout="wide")
 
-PRIMARY = "#0A3323"
-SECONDARY = "#105666"
-CARD = "#839958"
-BACKGROUND = "#F7F4D5"
-ACCENT = "#D3968C"
-
-st.markdown(f"""
+st.markdown("""
 <style>
-
-.stApp {{
-    background-color:{BACKGROUND};
-}}
-
-.metric-card {{
-    background:white;
-    padding:20px;
-    border-radius:20px;
-    text-align:center;
-    box-shadow:0px 4px 12px rgba(0,0,0,0.08);
-}}
-
+    html, body, [data-testid="stAppViewContainer"] { background-color: #F8F3F0 !important; }
+    [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #EFEAE6; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    f"<h1 style='color:{PRIMARY};'>🛡️ Insurance Gap Analysis</h1>",
-    unsafe_allow_html=True
-)
+# Sidebar
+st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
+st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>", unsafe_allow_html=True)
+for _ in range(16): st.sidebar.write("")
+st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>### Aulia", unsafe_allow_html=True)
 
-st.caption(
-    "Analisis kecukupan perlindungan asuransi"
-)
+st.title("Insurance Gap Analysis")
+st.markdown("Mengukur celah proteksi keuangan (Capital Underinsurance) menggunakan Pendekatan Nilai Ekonomi Manusia.")
 
-st.markdown("---")
+col_gap1, col_gap2 = st.columns(2)
+with col_gap1:
+    st.subheader("Parameter Keuangan & Kebutuhan")
+    pendapatan = st.number_input("Pendapatan Bersih Tahunan (Rp)", min_value=0, value=120_000_000, step=10_000_000)
+    pengeluaran_rutin = st.number_input("Pengeluaran Keluarga Tahunan (Rp)", min_value=0, value=80_000_000, step=5_000_000)
+    tahun_proteksi = st.slider("Durasi Penggantian Pendapatan yang Diinginkan (Tahun)", 1, 30, 15)
 
-col1, col2 = st.columns(2)
+with col_gap2:
+    st.subheader("Proteksi Saat Ini")
+    total_up_sekarang = st.number_input("Total Uang Pertanggungan Aktif Saat Ini (Rp)", min_value=0, value=300_000_000)
+    inflasi = st.slider("Asumsi Inflasi / Tingkat Pertumbuhan (%)", 1, 12, 5) / 100
 
-with col1:
-
-    penghasilan = st.number_input(
-        "Penghasilan Bulanan (Rp)",
-        min_value=0,
-        value=0,
-        step=1000000
-    )
-
-    tanggungan = st.number_input(
-        "Jumlah Tanggungan",
-        min_value=0,
-        value=0
-    )
-
-with col2:
-
-    proteksi_saat_ini = st.number_input(
-        "Proteksi Saat Ini (Rp)",
-        min_value=0,
-        value=0,
-        step=1000000
-    )
-
-kebutuhan_proteksi = (
-    penghasilan * 12 * 10
-) + (
-    tanggungan * 100_000_000
-)
-
-insurance_gap = kebutuhan_proteksi - proteksi_saat_ini
-
-
-c1, c2, c3 = st.columns(3)
-
-with c1:
-
-    st.markdown(
-        f"""
-        <div class='metric-card'>
-        <h4>Kebutuhan Proteksi</h4>
-        <h2>Rp {kebutuhan_proteksi:,.0f}</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with c2:
-
-    st.markdown(
-        f"""
-        <div class='metric-card'>
-        <h4>Proteksi Saat Ini</h4>
-        <h2>Rp {proteksi_saat_ini:,.0f}</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with c3:
-
-    st.markdown(
-        f"""
-        <div class='metric-card'>
-        <h4>Insurance Gap</h4>
-        <h2>Rp {insurance_gap:,.0f}</h2>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+v_gap = 1 / (1 + inflasi)
+annuity_factor = (1 - (v_gap ** tahun_proteksi)) / (1 - v_gap)
+up_ideal = pengeluaran_rutin * annuity_factor
+insurance_gap = up_ideal - total_up_sekarang
 
 st.markdown("---")
+st.subheader("Kesimpulan Analisis Finansial")
 
-fig = go.Figure()
-
-fig.add_trace(
-    go.Bar(
-        x=["Kebutuhan"],
-        y=[kebutuhan_proteksi],
-        name="Kebutuhan"
-    )
-)
-
-fig.add_trace(
-    go.Bar(
-        x=["Proteksi"],
-        y=[proteksi_saat_ini],
-        name="Proteksi"
-    )
-)
-
-fig.update_layout(
-    title="Perbandingan Kebutuhan dan Proteksi",
-    paper_bgcolor=BACKGROUND,
-    plot_bgcolor="white",
-    barmode="group"
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
-
-st.markdown("### 📌 Interpretasi")
-
-if kebutuhan_proteksi == 0:
-
-    st.info(
-        "Masukkan data untuk melihat hasil analisis."
-    )
-
-elif insurance_gap > 0:
-
-    st.error(
-        f"Terdapat kekurangan perlindungan sebesar Rp {insurance_gap:,.0f}"
-    )
-
-elif insurance_gap == 0:
-
-    st.success(
-        "Proteksi sudah sesuai kebutuhan."
-    )
-
+if insurance_gap > 0:
+    st.warning(f"Kekurangan nilai proteksi (Insurance Gap) yang harus dipenuhi: Rp {insurance_gap:,.2f} (Total kebutuhan ideal: Rp {up_ideal:,.2f})")
+    persen_siap = min(int((total_up_sekarang / up_ideal) * 100), 100)
+    st.progress(persen_siap / 100, text=f"Tingkat Kecukupan Proteksi: {persen_siap}%")
 else:
-
-    st.success(
-        "Proteksi melebihi kebutuhan minimum."
-    )
-
-st.markdown("### 💡 Rekomendasi")
-
-if tanggungan >= 3:
-
-    st.warning(
-        "Pertimbangkan peningkatan nilai pertanggungan karena jumlah tanggungan cukup banyak."
-    )
-
-elif tanggungan > 0:
-
-    st.info(
-        "Pastikan keluarga memiliki perlindungan yang memadai."
-    )
-
-else:
-
-    st.info(
-        "Fokus dapat diarahkan pada kesehatan dan dana pensiun."
-    )
-st.markdown("---")
-
-st.caption(
-    "ActuWise • Wise Decisions for Your Financial Future"
-)
+    st.success(f"Proteksi finansial sudah mencukupi. Nilai proteksi saat ini telah memenuhi standar kebutuhan nilai ekonomi ideal keluarga (Rp {up_ideal:,.2f}).")
