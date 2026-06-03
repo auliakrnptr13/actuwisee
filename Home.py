@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Konfigurasi Halaman (Harus paling atas)
+# 1. Konfigurasi Halaman (Harus berada di baris paling atas)
 st.set_page_config(
     page_title="ActuWise - Actuarial Dashboard",
     page_icon="🌿",
@@ -9,10 +9,10 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# 2. Blok Desain Tampilan Modern (CSS)
+# 2. Blok Desain Tampilan Kustom (CSS) - Tema Soft 3D Pastel UI Kit
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap');
     
     html, body, [data-testid="stAppViewContainer"] { 
         background-color: #F8F3F0 !important; 
@@ -43,7 +43,7 @@ st.markdown("""
         color: #8A8A8A;
     }
     
-    /* Kotak Kontainer Kartu */
+    /* Kotak Kontainer Kartu Dashboard */
     .dashboard-card {
         background-color: #FFFFFF;
         border: 1px solid #F0EAE6;
@@ -59,7 +59,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Metrik Data */
+    /* Angka Metrik Finansial */
     .metric-label {
         font-size: 0.8rem;
         color: #9A9A9A;
@@ -88,7 +88,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Fungsi Sidebar Navigasi
+# 3. Fungsi Sidebar Navigasi Otomatis (Responsif HP & Laptop)
 def render_sidebar():
     st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
     st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
@@ -96,7 +96,7 @@ def render_sidebar():
     
     st.sidebar.markdown("<p style='color: #8A8A8A; font-size:0.8rem; font-weight:600; text-transform:uppercase; margin-bottom:0.8rem;'>Menu Navigasi</p>", unsafe_allow_html=True)
     
-    st.sidebar.page_link("Home.py", label="Dashboard Utama", icon=":material/monitoring:")
+    st.sidebar.page_link("/", label="Dashboard Utama", icon=":material/monitoring:")
     st.sidebar.page_link("pages/2_Premium_Calculator.py", label="Kalkulator Premi", icon=":material/calculate:")
     st.sidebar.page_link("pages/3_Mortality_Analytics.py", label="Analisis Mortalitas", icon=":material/analytics:")
     st.sidebar.page_link("pages/4_Life_Expectancy.py", label="Angka Harapan Hidup", icon=":material/hourglass_empty:")
@@ -111,15 +111,16 @@ render_sidebar()
 # INTERFACE UTAMA DASHBOARD
 # ================================================
 
-# Banner Atas
+# Banner Judul Atas dengan Tagline Tambahan
 st.markdown("""
 <div class="dashboard-header">
     <div class="main-title">ActuWise Analytics</div>
+    <div class="main-subtitle" style="color: #ECA696; font-weight: 600; margin-bottom: 0.4rem; font-size: 1.1rem; letter-spacing: 0.5px;">Wise Decisions for Your Financial Future</div>
     <div class="main-subtitle">Sistem Ringkasan Indikator Performa Utama & Manajemen Risiko Aktuaria</div>
 </div>
 """, unsafe_allow_html=True)
 
-# Barisan Kartu Metrik
+# Barisan Kartu Metrik Ringkas
 m1, m2, m3, m4 = st.columns(4)
 
 with m1:
@@ -160,7 +161,7 @@ with m4:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Layout Grafik Berdampingan
+# Layout Grafik Berdampingan Estetik
 g1, g2 = st.columns(2)
 
 with g1:
