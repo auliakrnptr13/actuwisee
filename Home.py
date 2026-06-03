@@ -9,10 +9,10 @@ st.set_page_config(
     initial_sidebar_state="auto"
 )
 
-# 2. Blok Desain Tampilan Kustom (CSS) - Tema Soft 3D Pastel UI Kit
+# 2. Blok Desain
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
     html, body, [data-testid="stAppViewContainer"] { 
         background-color: #F8F3F0 !important; 
@@ -88,7 +88,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 3. Fungsi Sidebar Navigasi Otomatis (Responsif HP & Laptop)
+# 3. Fungsi Sidebar Navigasi Otomatis (Menggunakan URL Absolut agar Kebal dari KeyError)
 def render_sidebar():
     st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
     st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
@@ -96,12 +96,13 @@ def render_sidebar():
     
     st.sidebar.markdown("<p style='color: #8A8A8A; font-size:0.8rem; font-weight:600; text-transform:uppercase; margin-bottom:0.8rem;'>Menu Navigasi</p>", unsafe_allow_html=True)
     
-    st.sidebar.page_link("/", label="Dashboard Utama", icon=":material/monitoring:")
-    st.sidebar.page_link("pages/2_Premium_Calculator.py", label="Kalkulator Premi", icon=":material/calculate:")
-    st.sidebar.page_link("pages/3_Mortality_Analytics.py", label="Analisis Mortalitas", icon=":material/analytics:")
-    st.sidebar.page_link("pages/4_Life_Expectancy.py", label="Angka Harapan Hidup", icon=":material/hourglass_empty:")
-    st.sidebar.page_link("pages/5_Insurance_Gap.py", label="Analisis Celah Proteksi", icon=":material/shield:")
-    st.sidebar.page_link("pages/6_About.py", label="Tentang Aplikasi", icon=":material/info:")
+    # Menggunakan tautan langsung ke URL aplikasi publik kamu agar anti-gagal
+    st.sidebar.page_link("https://actuwisee-jjitpdtlevtrngvlkpd75u.streamlit.app/", label="Dashboard Utama", icon=":material/monitoring:")
+    st.sidebar.page_link("https://actuwisee-jjitpdtlevtrngvlkpd75u.streamlit.app/Premium_Calculator", label="Kalkulator Premi", icon=":material/calculate:")
+    st.sidebar.page_link("https://actuwisee-jjitpdtlevtrngvlkpd75u.streamlit.app/Mortality_Analytics", label="Analisis Mortalitas", icon=":material/analytics:")
+    st.sidebar.page_link("https://actuwisee-jjitpdtlevtrngvlkpd75u.streamlit.app/Life_Expectancy", label="Angka Harapan Hidup", icon=":material/hourglass_empty:")
+    st.sidebar.page_link("https://actuwisee-jjitpdtlevtrngvlkpd75u.streamlit.app/Insurance_Gap", label="Analisis Celah Proteksi", icon=":material/shield:")
+    st.sidebar.page_link("https://actuwisee-jjitpdtlevtrngvlkpd75u.streamlit.app/About", label="Tentang Aplikasi", icon=":material/info:")
     
     st.sidebar.markdown("<hr style='border-color:#EFEAE6; margin-top:3rem;'>### Aulia", unsafe_allow_html=True)
 
