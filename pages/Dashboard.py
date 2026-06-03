@@ -1,171 +1,53 @@
-
 import streamlit as st
-import plotly.graph_objects as go
+import pandas as pd
 
-st.set_page_config(
-    page_title="Dashboard",
-    page_icon="📊",
-    layout="wide"
-)
+st.set_page_config(page_title="Dashboard - ActuWise", layout="wide")
 
-PRIMARY = "#0A3323"
-SECONDARY = "#105666"
-CARD = "#839958"
-BACKGROUND = "#F7F4D5"
-ACCENT = "#D3968C"
-
-st.markdown(f"""
+st.markdown("""
 <style>
-
-.stApp {{
-    background-color:{BACKGROUND};
-}}
-
-.card {{
-    background:white;
-    border-radius:20px;
-    padding:20px;
-    text-align:center;
-    box-shadow:0px 4px 12px rgba(0,0,0,0.08);
-}}
-
-.card-title {{
-    color:{SECONDARY};
-    font-size:15px;
-}}
-
-.card-value {{
-    color:{PRIMARY};
-    font-size:28px;
-    font-weight:bold;
-}}
-
+    html, body, [data-testid="stAppViewContainer"] { background-color: #F8F3F0 !important; }
+    [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #EFEAE6; }
+    div[data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 700 !important; color: #ECA696; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    f"""
-    <h1 style='color:{PRIMARY};'>
-    📊 Dashboard Overview
-    </h1>
-    """,
-    unsafe_allow_html=True
-)
+# Sidebar
+st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
+st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>", unsafe_allow_html=True)
+for _ in range(16): st.sidebar.write("")
+st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>### Aulia", unsafe_allow_html=True)
 
-st.caption("Wise Decisions for Your Financial Future")
+# Judul Dashboard
+st.title("Financial & Actuarial Dashboard")
+st.markdown("Ringkasan eksekutif dan indikator performa utama portofolio manajemen risiko.")
+st.markdown("<br>", unsafe_allow_html=True)
 
-st.markdown("---")
+# Layout Metrik
+m1, m2, m3, m4 = st.columns(4)
+m1.metric(label="Total Premium Written", value="Rp 4.25 M", delta="+14.2%")
+m2.metric(label="Annuity Payout Exposure", value="Rp 1.82 M", delta="-2.1%")
+m3.metric(label="Average Reserve Fund", value="Rp 520 Juta", delta="+5.8%")
+m4.metric(label="Active Insured Lives", value="12,450", delta="+8.3%")
 
-c1, c2, c3, c4 = st.columns(4)
+st.markdown("<br><hr style='border-color:#EFEAE6;'><br>", unsafe_allow_html=True)
 
-with c1:
-    st.markdown("""
-    <div class='card'>
-        <div class='card-title'>Premi Estimasi</div>
-        <div class='card-value'>Rp 0</div>
-    </div>
-    """, unsafe_allow_html=True)
+# Grafik dengan data representasi warna estetik bawaan Streamlit
+g1, g2 = st.columns(2)
+with g1:
+    st.subheader("Proyeksi Klaim vs Pendapatan Premi")
+    df_line = pd.DataFrame({
+        'Bulan': ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+        'Pendapatan Premi': [400, 420, 450, 430, 470, 490],
+        'Klaim Terbayar': [120, 150, 110, 190, 140, 160]
+    }).set_index('Bulan')
+    # Menggunakan kurva area agar gradasi warna pastelnya menyerupai gambar yang kamu berikan
+    st.area_chart(df_line)
 
-with c2:
-    st.markdown("""
-    <div class='card'>
-        <div class='card-title'>Mortalitas (qx)</div>
-        <div class='card-value'>0.0000</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with c3:
-    st.markdown("""
-    <div class='card'>
-        <div class='card-title'>Life Expectancy</div>
-        <div class='card-value'>80 Tahun</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with c4:
-    st.markdown("""
-    <div class='card'>
-        <div class='card-title'>Insurance Gap</div>
-        <div class='card-value'>Rp 0</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.write("")
-st.write("")
-
-st.subheader("📈 Mortality Trend")
-
-usia = [20, 30, 40, 50, 60, 70, 80]
-
-qx = [
-    0.002,
-    0.003,
-    0.005,
-    0.009,
-    0.016,
-    0.042,
-    0.105
-]
-
-fig = go.Figure()
-
-fig.add_trace(
-    go.Scatter(
-        x=usia,
-        y=qx,
-        mode="lines+markers",
-        name="qx"
-    )
-)
-
-fig.update_layout(
-    title="Kurva Mortalitas",
-    paper_bgcolor=BACKGROUND,
-    plot_bgcolor="white"
-)
-
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
-
-st.subheader("📋 Ringkasan Sistem")
-
-st.info(
-    """ActuWise adalah platform aktuaria berbasis web
-yang membantu pengguna melakukan simulasi premi,
-analisis mortalitas, life expectancy,
-dan insurance gap secara interaktif.
-"""
-)
-
-st.write("")
-st.write("")
-
-st.subheader("🚀 Quick Access")
-
-a, b, c = st.columns(3)
-
-with a:
-    st.page_link(
-        "pages/2_Premi.py",
-        label="💰 Premium Calculator"
-    )
-
-with b:
-    st.page_link(
-        "pages/3_Mortalitas.py",
-        label="📊 Mortality Analytics"
-    )
-
-with c:
-    st.page_link(
-        "pages/5_Insurance_Gap.py",
-        label="🛡️ Insurance Gap"
-    )
-
-st.markdown("---")
-
-st.caption(
-    "© 2026 ActuWise • Wise Decisions for Your Financial Future"
-)
+with g2:
+    st.subheader("Distribusi Portofolio Berdasarkan Produk")
+    df_bar = pd.DataFrame({
+        'Produk': ['Term Life', 'Whole Life', 'Endowment', 'Annuity'],
+        'Proporsi (%)': [40, 25, 20, 15]
+    }).set_index('Produk')
+    st.bar_chart(df_bar)
