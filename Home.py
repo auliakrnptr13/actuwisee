@@ -187,7 +187,7 @@ with g2:
         'Proporsi (%)': [40, 25, 20, 15]
     }).set_index('Produk')
     st.bar_chart(df_bar)
-    st.markdown('</div>', unsafe_allow_html=True)    }
+    st.markdown('</div>', unsafe_allow_html=True)    
     .brand-title {
         font-size: 3.5rem !important;
         font-weight: 700 !important;
