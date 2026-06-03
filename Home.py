@@ -17,11 +17,11 @@ def render_sidebar():
     
     st.sidebar.subheader("Menu Navigasi")
     st.sidebar.page_link("Home.py", label="Dashboard Utama", icon=":material/monitoring:")
-    st.sidebar.page_link("pages/2_Premium_Calculator.py", label="Kalkulator Premi", icon=":material/calculate:")
-    st.sidebar.page_link("pages/3_Mortality_Analytics.py", label="Analisis Mortalitas", icon=":material/analytics:")
-    st.sidebar.page_link("pages/4_Life_Expectancy.py", label="Angka Harapan Hidup", icon=":material/hourglass_empty:")
-    st.sidebar.page_link("pages/5_Insurance_Gap.py", label="Analisis Celah Proteksi", icon=":material/shield:")
-    st.sidebar.page_link("pages/6_About.py", label="Tentang Aplikasi", icon=":material/info:")
+    st.sidebar.page_link("pages/Premium_Calculator.py", label="Kalkulator Premi", icon=":material/calculate:")
+    st.sidebar.page_link("pages/Mortality_Analytics.py", label="Analisis Mortalitas", icon=":material/analytics:")
+    st.sidebar.page_link("pages/Life_Expectancy.py", label="Angka Harapan Hidup", icon=":material/hourglass_empty:")
+    st.sidebar.page_link("pages/Insurance_Gap.py", label="Analisis Celah Proteksi", icon=":material/shield:")
+    st.sidebar.page_link("pages/About.py", label="Tentang Aplikasi", icon=":material/info:")
     
     st.sidebar.markdown("---")
     st.sidebar.write("**Platform Developer:**")
