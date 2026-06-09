@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+# 1. Konfigurasi Halaman & Tema Dasar
 st.set_page_config(
     page_title="ActuWise v2.0",
     page_icon="🌿",
@@ -9,6 +10,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Injeksi CSS untuk menjinakkan warna hitam pada form input & tombol
 st.markdown("""
 <style>
     html, body, [data-testid='stAppViewContainer'] {
@@ -16,6 +18,46 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
     [data-testid='stSidebarNav'] { display: none !important; }
+    
+    /* Memperbaiki Kotak Form agar tidak hitam */
+    [data-testid="stForm"] {
+        background-color: #FFFFFF !important;
+        border: 1px solid #FAD6DC !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+    }
+
+    /* Memperbaiki semua Kolom Input Teks agar latar belakangnya Putih Bersih */
+    div[data-baseweb="input"] {
+        background-color: #FFFFFF !important;
+        color: #333333 !important;
+        border-radius: 8px !important;
+    }
+    input[data-testid="stTextInputBase"] {
+        background-color: #FFFFFF !important;
+        color: #333333 !important;
+    }
+    
+    /* Memperbaiki warna label teks di atas kolom agar terbaca jelas */
+    .stTextInput label {
+        color: #6E8E85 !important;
+        font-weight: 600 !important;
+    }
+
+    /* Memperbaiki tombol Daftar/Masuk agar tidak hitam kusam */
+    button[kind="formSubmit"] {
+        background-color: #6E8E85 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: bold !important;
+        transition: all 0.3s ease !important;
+    }
+    button[kind="formSubmit"]:hover {
+        background-color: #D4A5B1 !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(212, 165, 177, 0.4) !important;
+    }
     
     /* Gaya kotak tab login/register minimalis */
     .stTabs [data-baseweb="tab-list"] {
@@ -34,7 +76,7 @@ st.markdown("""
         font-weight: bold !important;
     }
 
-    /* INOVASI: Desain Kartu Melayang dengan Efek Transisi Halus */
+    /* Desain Kartu Melayang dengan Efek Transisi Halus */
     .menu-card {
         background: #FFFFFF;
         padding: 24px;
@@ -54,6 +96,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# Initialize Session States untuk sistem login, database lokal, & pemilihan menu
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'menu_terpilih' not in st.session_state:
@@ -61,13 +104,16 @@ if 'menu_terpilih' not in st.session_state:
 if 'database_pengguna' not in st.session_state:
     st.session_state.database_pengguna = {} 
 
+# ==========================================
+# FASE 1: GATEWAY KEAMANAN (LOGIN & REGISTER)
+# ==========================================
 if not st.session_state.logged_in:
     st.markdown("<br><br>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns([1, 2, 1])
     
     with c2:
-        st.markdown("<h2 style='text-align: center; color: #D4A5B1;'>ActuWise Security Gateway</h2>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #8A8A8A; margin-top:0;'>Silakan masuk atau buat akun baru untuk mengakses platform</p>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; color: #D4A5B1; font-weight: 700;'>ActuWise Security Gateway</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #6E8E85; font-weight: 500; margin-top:0;'>Silakan masuk atau buat akun baru untuk mengakses platform</p>", unsafe_allow_html=True)
         
         tab_login, tab_register = st.tabs(["Masuk (Login)", "Daftar Akun (Register)"])
         
@@ -86,6 +132,7 @@ if not st.session_state.logged_in:
                     else:
                         st.error("Username/Email atau Password salah! Pastikan akun sudah terdaftar.")
                         
+        # --- TAB REGISTER ---
         with tab_register:
             st.markdown("<br>", unsafe_allow_html=True)
             with st.form("form_register"):
@@ -106,12 +153,16 @@ if not st.session_state.logged_in:
                         
     st.stop()
 
+# ==========================================
+# FASE 2: DASHBOARD UTAMA SETELAH LOGIN SUKSES
+# ==========================================
 st.markdown("<h1 style='color: #D4A5B1; font-weight:700; margin-bottom:0; text-align: center;'>ActuWise Analytics 2.0</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #6E8E85; font-weight: 600; letter-spacing: 0.5px;'>Wise Decisions for Your Financial Future</p>", unsafe_allow_html=True)
+st.caption("Wise Decisions for Your Financial Future")
 st.markdown("<hr style='border-color:#FAD6DC; margin-bottom: 30px;'>", unsafe_allow_html=True)
 
 st.markdown("<h4 style='color: #6E8E85; text-align: center; margin-bottom: 25px;'>Panel Navigasi Interaktif</h4>", unsafe_allow_html=True)
 
+# GRID KARTU MENU INOVATIF
 col_a1, col_a2, col_a3 = st.columns(3)
 with col_a1:
     st.markdown("""
@@ -178,6 +229,11 @@ with col_b3:
 
 st.markdown("<br><hr style='border-color:#FAD6DC;'><br>", unsafe_allow_html=True)
 
+# ==========================================
+# FASE 3: LOGIKA KONTEN DINAMIS (BEBAS RUMUS)
+# ==========================================
+
+# --- MENU 1: DASHBOARD UTAMA ---
 if st.session_state.menu_terpilih == "Dashboard Utama":
     st.markdown(f"### Menu Aktif: {st.session_state.menu_terpilih}")
     
@@ -212,17 +268,18 @@ if st.session_state.menu_terpilih == "Dashboard Utama":
         df_bar = pd.DataFrame({'Komponen': ['Premi', 'Klaim'], 'Nilai': [float(val1), float(val2)]}).set_index('Komponen')
         st.bar_chart(df_bar, color="#E2F0CB")
 
+# --- MENU 2: KALKULATOR PREMI ---
 elif st.session_state.menu_terpilih == "Kalkulator Premi":
     st.markdown(f"### Menu Aktif: {st.session_state.menu_terpilih}")
     with st.container(border=True):
         input_premi_dasar = st.number_input("Nilai Premi Dasar Utama (Rp)", min_value=0, value=0, step=10000)
         usia = st.slider("Usia Pemohon Aktual", 0, 70, 0)
         
-        # Perbaikan logika kalkulasi matematika agar aman dari pembacaan float/int 0
         total_kalkulasi = 0.0 if (input_premi_dasar == 0 or usia == 0) else float(input_premi_dasar * (1 + (usia * 0.02)))
             
         st.markdown(f"<div style='background-color: #E2F0CB; padding: 25px; border-radius: 12px; text-align: center; border: 2px dashed #9CC2BA;'><h5>Estimasi Beban Premi Bulanan</h5><h1 style='color: #6E8E85; margin:10px 0;'>Rp {total_kalkulasi:,.0f}</h1></div>", unsafe_allow_html=True)
 
+# --- MENU 3: ANALISIS MORTALITAS ---
 elif st.session_state.menu_terpilih == "Analisis Mortalitas":
     st.markdown(f"### Menu Aktif: {st.session_state.menu_terpilih}")
     st.write("Input nilai estimasi probabilitas risiko kematian untuk penyesuaian proyeksi grafik populasi:")
@@ -231,6 +288,7 @@ elif st.session_state.menu_terpilih == "Analisis Mortalitas":
     df_mort = pd.DataFrame({'Metrik': ['Kondisi Dasar', 'Hasil Kalkulasi'], 'Tingkat Risiko': [0.0, float(val_qx)]}).set_index('Metrik')
     st.bar_chart(df_mort, color="#9CC2BA")
 
+# --- MENU 4: ANGKA HARAPAN HIDUP ---
 elif st.session_state.menu_terpilih == "Angka Harapan Hidup":
     st.markdown(f"### Menu Aktif: {st.session_state.menu_terpilih}")
     
@@ -248,6 +306,7 @@ elif st.session_state.menu_terpilih == "Angka Harapan Hidup":
         
     st.markdown(f"<div style='background-color: white; padding: 25px; border-radius: 12px; border-left: 8px solid {warna_grafik};'><h4>Sisa Angka Harapan Hidup Efektif</h4><h2>{harapan_hidup_terkoreksi:.1f} Tahun</h2><p style='margin:0;'>Indeks Variabel Beban Risiko: {loading_factor} kali</p></div>", unsafe_allow_html=True)
 
+# --- MENU 5: ANALISIS CELAH PROTEKSI ---
 elif st.session_state.menu_terpilih == "Analisis Celah Proteksi":
     st.markdown(f"### Menu Aktif: {st.session_state.menu_terpilih}")
     
@@ -257,6 +316,7 @@ elif st.session_state.menu_terpilih == "Analisis Celah Proteksi":
     df_gap = pd.DataFrame({'Kondisi': ['Kebutuhan Ideal', 'Kepemilikan Riil'], 'Nilai Proteksi (M)': [float(ideal), float(riil)]}).set_index('Kondisi')
     st.line_chart(df_gap, color=["#D4A5B1"])
 
+# --- MENU 6: TENTANG APLIKASI ---
 elif st.session_state.menu_terpilih == "Tentang Aplikasi":
     st.markdown(f"### Menu Aktif: {st.session_state.menu_terpilih}")
     st.markdown("""
@@ -268,6 +328,7 @@ elif st.session_state.menu_terpilih == "Tentang Aplikasi":
     </div>
     """, unsafe_allow_html=True)
 
+# Tombol Keluar Sistem
 st.markdown("<br><br><br>", unsafe_allow_html=True)
 if st.button("Keluar Aplikasi (Log Out)", use_container_width=True):
     st.session_state.logged_in = False
