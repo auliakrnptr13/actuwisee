@@ -1,47 +1,42 @@
 import streamlit as st
+import plotly.graph_objects as go
 
-st.set_page_config(page_title="Insurance Gap - ActuWise", layout="wide")
+st.set_page_config(page_title="Analisis Celah Proteksi", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
-    html, body, [data-testid="stAppViewContainer"] { background-color: #F8F3F0 !important; }
-    [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #EFEAE6; }
+    html, body, [data-testid='stAppViewContainer'] { background-color: #FFF0F2 !important; }
+    [data-testid='stSidebarNav'] { display: none !important; }
+    .gap-box {
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar
-st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
-st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
-st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>", unsafe_allow_html=True)
-for _ in range(16): st.sidebar.write("")
-st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>### Aulia", unsafe_allow_html=True)
-
-st.title("Insurance Gap Analysis")
-st.markdown("Mengukur celah proteksi keuangan (Capital Underinsurance) menggunakan Pendekatan Nilai Ekonomi Manusia.")
-
-col_gap1, col_gap2 = st.columns(2)
-with col_gap1:
-    st.subheader("Parameter Keuangan & Kebutuhan")
-    pendapatan = st.number_input("Pendapatan Bersih Tahunan (Rp)", min_value=0, value=120_000_000, step=10_000_000)
-    pengeluaran_rutin = st.number_input("Pengeluaran Keluarga Tahunan (Rp)", min_value=0, value=80_000_000, step=5_000_000)
-    tahun_proteksi = st.slider("Durasi Penggantian Pendapatan yang Diinginkan (Tahun)", 1, 30, 15)
-
-with col_gap2:
-    st.subheader("Proteksi Saat Ini")
-    total_up_sekarang = st.number_input("Total Uang Pertanggungan Aktif Saat Ini (Rp)", min_value=0, value=300_000_000)
-    inflasi = st.slider("Asumsi Inflasi / Tingkat Pertumbuhan (%)", 1, 12, 5) / 100
-
-v_gap = 1 / (1 + inflasi)
-annuity_factor = (1 - (v_gap ** tahun_proteksi)) / (1 - v_gap)
-up_ideal = pengeluaran_rutin * annuity_factor
-insurance_gap = up_ideal - total_up_sekarang
-
+st.markdown("<h2 style='color: #D4A5B1;'>Kesenjangan Perlindungan Finansial</h2>", unsafe_allow_html=True)
+st.markdown("<p style='color: #8A8A8A;'>Mengidentifikasi selisih antara kecukupan dana ideal dan realisasi aset proteksi aktif</p>", unsafe_allow_html=True)
 st.markdown("---")
-st.subheader("Kesimpulan Analisis Finansial")
 
-if insurance_gap > 0:
-    st.warning(f"Kekurangan nilai proteksi (Insurance Gap) yang harus dipenuhi: Rp {insurance_gap:,.2f} (Total kebutuhan ideal: Rp {up_ideal:,.2f})")
-    persen_siap = min(int((total_up_sekarang / up_ideal) * 100), 100)
-    st.progress(persen_siap / 100, text=f"Tingkat Kecukupan Proteksi: {persen_siap}%")
-else:
-    st.success(f"Proteksi finansial sudah mencukupi. Nilai proteksi saat ini telah memenuhi standar kebutuhan nilai ekonomi ideal keluarga (Rp {up_ideal:,.2f}).")
+c1, c2 = st.columns(2)
+with c1:
+    pendapatan = st.number_input("Pendapatan Bersih Bulanan (Rp)", min_value=0, value=0, step=1000000)
+    tanggungan = st.number_input("Jumlah Anggota Keluarga Tanggungan", min_value=0, value=0)
+with c2:
+    proteksi_saat_ini = st.number_input("Nilai Polis Aktif Saat Ini (Rp)", min_value=0, value=0, step=1000000)
+
+kebutuhan_ideal = (pendapatan * 12 * 10) + (tanggungan * 100000000)
+selisih_gap = kebutuhan_ideal - proteksi_saat_ini
+
+st.markdown("<br>", unsafe_allow_html=True)
+m1, m2, m3 = st.columns(3)
+with m1:
+    st.markdown(f"<div class='gap-box'><h5>Total Kebutuhan Ideal</h5><h3 style='color:#6E8E85;'>Rp {kebutuhan_ideal:,.0f}</h3></div>", unsafe_allow_html=True)
+with m2:
+    st.markdown(f"<div class='gap-box'><h5>Total Proteksi Riil</h5><h3 style='color:#6E8E85;'>Rp {proteksi_saat_ini:,.0f}</h3></div>", unsafe_allow_html=True)
+with m3:
+    warna = "#D4A5B1" if selisih_gap > 0 else "#9CC2BA"
+    st.markdown(f"<div class='gap-box' style='background:#FFF5F6;'><h5>Defisit Celah Proteksi</h5><h3 style='color:{warna};'>Rp {selisih_gap:,.0f}</h3></div>", unsafe_allow_html=True)
