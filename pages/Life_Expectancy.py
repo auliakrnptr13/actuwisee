@@ -1,46 +1,40 @@
 import streamlit as st
-import pandas as pd
+import plotly.graph_objects as go
 
-st.set_page_config(page_title="Life Expectancy - ActuWise", layout="wide")
+st.set_page_config(page_title="Ekspektasi Hidup", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
-    html, body, [data-testid="stAppViewContainer"] { background-color: #F8F3F0 !important; }
-    [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #EFEAE6; }
+    html, body, [data-testid='stAppViewContainer'] { background-color: #FFF0F2 !important; }
+    [data-testid='stSidebarNav'] { display: none !important; }
+    .card-display {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(212, 165, 177, 0.1);
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar
-st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
-st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
-st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>", unsafe_allow_html=True)
-for _ in range(16): st.sidebar.write("")
-st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>### Aulia", unsafe_allow_html=True)
+st.markdown("<h2 style='color: #6E8E85;'>Analisis Angka Harapan Hidup</h2>", unsafe_allow_html=True)
+st.markdown("<p style='color: #8A8A8A;'>Proyeksi matematis sisa durasi hidup produktif berdasarkan profil kesehatan kronis</p>", unsafe_allow_html=True)
+st.markdown("---")
 
-st.title("Life Expectancy Projection")
-st.markdown("Perhitungan angka harapan hidup masa depan ($e_x$) menggunakan integrasi numerik diskret probabilitas kelangsungan hidup.")
+usia_saat_ini = st.number_input("Input Batas Usia Pemohon Saat Ini", min_value=0, max_value=100, value=0)
+sisa_harapan = max(0, 80 - usia_saat_ini)
+estimasi_akhir = usia_saat_ini + sisa_harapan
 
-st.latex(r"e_x = \sum_{t=1}^{\omega - x} {}_tp_x")
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown(f"<div class='card-display' style='border-left: 6px solid #9CC2BA;'><h5>Sisa Proyeksi Harapan Hidup</h5><h2>{sisa_harapan} Tahun</h2></div>", unsafe_allow_html=True)
+with col2:
+    st.markdown(f"<div class='card-display' style='border-left: 6px solid #D4A5B1;'><h5>Estimasi Target Batas Usia</h5><h2>{estimasi_akhir} Tahun</h2></div>", unsafe_allow_html=True)
 
-usia_input = st.number_input("Masukkan Usia Saat Ini untuk Proyeksi", min_value=0, max_value=90, value=22)
-
-ages = list(range(0, 110))
-qx = [min(0.0005 + 0.00008 * (1.09 ** x), 1.0) for x in ages]
-
-tpx_list = []
-t_p_x = 1.0
-for x in range(usia_input, 105):
-    current_qx = qx[x]
-    t_p_x *= (1 - current_qx)
-    tpx_list.append(t_p_x)
-
-ex = sum(tpx_list)
-
-st.info(f"Seseorang yang saat ini berusia {usia_input} tahun, secara statistik diproyeksikan memiliki sisa angka harapan hidup tambahan selama {ex:.2f} tahun (Hingga mencapai total usia {usia_input + ex:.2f} tahun).")
-
-st.subheader(f"Probabilitas Bertahan Hidup Hingga t-Tahun ke Depan (_tp_{{{usia_input}}})")
-df_tpx = pd.DataFrame({
-    'Tahun Ke-t': range(1, len(tpx_list) + 1),
-    'Probabilitas Bertahan': tpx_list
-}).set_index('Tahun Ke-t')
-st.area_chart(df_tpx)
+st.markdown("<br>", unsafe_allow_html=True)
+if usia_saat_ini == 0:
+    st.info("Silakan input parameter usia untuk memunculkan analisis komparatif.")
+elif usia_saat_ini < 40:
+    st.success("Kategori usia produktif awal. Durasi investasi jangka panjang sangat direkomendasikan.")
+else:
+    st.warning("Prioritas utama dialihkan ke jaminan kesehatan masa pensiun.")
