@@ -1,52 +1,45 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
-st.set_page_config(page_title="Mortality Analytics - ActuWise", layout="wide")
+st.set_page_config(page_title="Analisis Kematian", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
 <style>
-    html, body, [data-testid="stAppViewContainer"] { background-color: #F8F3F0 !important; }
-    [data-testid="stSidebar"] { background-color: #FFFFFF !important; border-right: 1px solid #EFEAE6; }
+    html, body, [data-testid='stAppViewContainer'] { background-color: #FFF0F2 !important; }
+    [data-testid='stSidebarNav'] { display: none !important; }
+    .metric-card {
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar
-st.sidebar.markdown("<h2 style='color: #ECA696; font-weight:700; margin-bottom:0;'>ActuWise</h2>", unsafe_allow_html=True)
-st.sidebar.markdown("<p style='color: #9A9A9A; font-size:0.85rem; margin-top:0;'>Smart Actuarial Platform</p>", unsafe_allow_html=True)
-st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>", unsafe_allow_html=True)
-for _ in range(16): st.sidebar.write("")
-st.sidebar.markdown("<hr style='border-color:#EFEAE6;'>### Aulia", unsafe_allow_html=True)
-
-st.title("Mortality Analytics & Curve Visualizer")
-st.markdown("Analisis visual Tabel Mortalitas Indonesia (TMI) untuk memodelkan struktur intensitas mortalitas.")
+st.markdown("<h2 style='color: #D4A5B1;'>Analisis Tren Demografi Risiko</h2>", unsafe_allow_html=True)
+st.markdown("<p style='color: #8A8A8A;'>Metrik pemetaan probabilitas ketahanan hidup dan laju fatalitas populasi</p>", unsafe_allow_html=True)
+st.markdown("---")
 
 ages = list(range(0, 101))
-qx = [0.0005 + 0.00008 * (1.09 ** x) if x > 5 else 0.005 / (x+1) for x in ages]
-qx = [min(q, 1.0) for q in qx]
+rasio_kematian = [0.025 if a<1 else 0.0015 if a<10 else 0.0022 if a<30 else 0.005 if a<50 else 0.042 if a<80 else 0.22 for a in ages]
 
-lx = []
-current_lx = 100000
-for q in qx:
-    lx.append(int(current_lx))
-    current_lx *= (1 - q)
+df = pd.DataFrame({"Usia": ages, "Rasio Kematian": rasio_kematian})
+df["Rasio Bertahan Hidup"] = 1 - df["Rasio Kematian"]
 
-df_mortalitas = pd.DataFrame({
-    'Usia (x)': ages,
-    'lx (Jumlah Bertahan)': lx,
-    'qx (Peluang Meninggal)': qx
-}).set_index('Usia (x)')
+usia_pilihan = st.slider("Pilih Parameter Usia Target", 0, 100, 25)
 
-usia_pilihan = st.slider("Pilih Rentang Usia Analisis", 0, 100, (20, 80))
-df_filtered = df_mortalitas.loc[usia_pilihan[0]:usia_pilihan[1]]
+val_kematian = df[df["Usia"] == usia_pilihan]["Rasio Kematian"].values[0]
+val_bertahan = df[df["Usia"] == usia_pilihan]["Rasio Bertahan Hidup"].values[0]
 
-col_g1, col_g2 = st.columns(2)
-with col_g1:
-    st.subheader("Kurva Kelangsungan Hidup (lx)")
-    st.area_chart(df_filtered['lx (Jumlah Bertahan)'])
-with col_g2:
-    st.subheader("Kurva Intensitas Kematian (qx)")
-    st.line_chart(df_filtered['qx (Peluang Meninggal)'])
+c1, c2 = st.columns(2)
+with c1:
+    st.markdown(f"<div class='metric-card' style='border-top: 4px solid #D4A5B1;'><h5>Rasio Kerentanan Kematian</h5><h2>{val_kematian:.4f}</h2></div>", unsafe_allow_html=True)
+with c2:
+    st.markdown(f"<div class='metric-card' style='border-top: 4px solid #9CC2BA;'><h5>Rasio Peluang Bertahan Hidup</h5><h2>{val_bertahan:.4f}</h2></div>", unsafe_allow_html=True)
 
-st.markdown("---")
-st.subheader("Data Mentah Tabel Mortalitas")
-st.dataframe(df_filtered, use_container_width=True)
+st.markdown("<br>", unsafe_allow_html=True)
+fig = px.line(df, x="Usia", y="Rasio Kematian", title="Kurva Eksponensial Risiko Berdasarkan Kematian")
+fig.update_layout(paper_bgcolor="#FFF0F2", plot_bgcolor="white")
+st.plotly_chart(fig, use_container_width=True)
