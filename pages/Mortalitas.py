@@ -1,45 +1,76 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import numpy as np
+import plotly.graph_objects as go
 
-st.set_page_config(page_title="Analisis Kematian", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Analisis Mortalitas 3D - ActuWise", layout="wide")
 
 st.markdown("""
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    html, body, [data-testid='stAppViewContainer'] { background-color: #FFF0F2 !important; }
-    [data-testid='stSidebarNav'] { display: none !important; }
-    .metric-card {
-        background: white;
-        padding: 20px;
-        border-radius: 16px;
-        text-align: center;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    html, body, [data-testid='stAppViewContainer'] {
+        background-color: #FFF2F4 !important;
+        font-family: 'Inter', sans-serif;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h2 style='color: #D4A5B1;'>Analisis Tren Demografi Risiko</h2>", unsafe_allow_html=True)
-st.markdown("<p style='color: #8A8A8A;'>Metrik pemetaan probabilitas ketahanan hidup dan laju fatalitas populasi</p>", unsafe_allow_html=True)
-st.markdown("---")
+st.markdown("<h2 style='color: #C38B9B;'><i class='fa-solid fa-cube'></i> Analisis Mortalitas Ruang 3D</h2>", unsafe_allow_html=True)
+st.markdown("<hr style='border-color:#FAD6DC;'>", unsafe_allow_html=True)
 
-ages = list(range(0, 101))
-rasio_kematian = [0.025 if a<1 else 0.0015 if a<10 else 0.0022 if a<30 else 0.005 if a<50 else 0.042 if a<80 else 0.22 for a in ages]
+# Input Interaktif dari User
+val_qx = st.number_input("Sesuaikan Faktor Risiko Kematian Dasar (q_x)", min_value=0.001, max_value=1.000, value=0.024, format="%.4f")
 
-df = pd.DataFrame({"Usia": ages, "Rasio Kematian": rasio_kematian})
-df["Rasio Bertahan Hidup"] = 1 - df["Rasio Kematian"]
+st.write("##### 🛠️ Pengaturan Dimensi Visualisasi")
+tipe_grafik_3d = st.selectbox("Pilih Model Grafik 3D (Bisa Diputar/Digeser):", ["Grafik Batang Balok 3D", "Grafik Garis Ruang 3D"])
 
-usia_pilihan = st.slider("Pilih Parameter Usia Target", 0, 100, 25)
+# Data untuk visualisasi 3D (Sumbu X: Kategori, Sumbu Y: Wilayah, Sumbu Z: Nilai Risiko)
+kategori = ['Rasio Wilayah A', 'Rasio Wilayah B', 'Hasil Koreksi']
+wilayah_index = [1, 2, 3] # Sumbu kedalaman ruang Y
+nilai_risiko = [0.015, 0.032, float(val_qx)]
 
-val_kematian = df[df["Usia"] == usia_pilihan]["Rasio Kematian"].values[0]
-val_bertahan = df[df["Usia"] == usia_pilihan]["Rasio Bertahan Hidup"].values[0]
+# MEMBUAT GRAFIK 3D INTERAKTIF
+fig = go.Figure()
 
-c1, c2 = st.columns(2)
-with c1:
-    st.markdown(f"<div class='metric-card' style='border-top: 4px solid #D4A5B1;'><h5>Rasio Kerentanan Kematian</h5><h2>{val_kematian:.4f}</h2></div>", unsafe_allow_html=True)
-with c2:
-    st.markdown(f"<div class='metric-card' style='border-top: 4px solid #9CC2BA;'><h5>Rasio Peluang Bertahan Hidup</h5><h2>{val_bertahan:.4f}</h2></div>", unsafe_allow_html=True)
+if tipe_grafik_3d == "Grafik Batang Balok 3D":
+    # Membuat efek balok timbul menggunakan go.Bar3d alternatif (Mesh3d)
+    for i in range(len(kategori)):
+        # Membuat koordinat kubus/balok untuk efek 3D nyata
+        fig.add_trace(go.Mesh3d(
+            x=[i, i+0.5, i+0.5, i, i, i+0.5, i+0.5, i],
+            y=[0, 0, 1, 1, 0, 0, 1, 1],
+            z=[0, 0, 0, 0, nilai_risiko[i], nilai_risiko[i], nilai_risiko[i], nilai_risiko[i]],
+            colorbar_title='Skala Risiko',
+            colorscale=[[0, '#9CC2BA'], [1, '#D4A5B1']],
+            intensity=[0, 0, 0, 0, 1, 1, 1, 1],
+            name=kategori[i],
+            showscale=False
+        ))
+else:
+    # Grafik Garis Alur Ruang 3D
+    fig.add_trace(go.Scatter3d(
+        x=kategori,
+        y=wilayah_index,
+        z=nilai_risiko,
+        mode='lines+markers',
+        line=dict(color='#C38B9B', width=6),
+        marker=dict(size=8, color='#6E8E85', opacity=0.9)
+    ))
 
-st.markdown("<br>", unsafe_allow_html=True)
-fig = px.line(df, x="Usia", y="Rasio Kematian", title="Kurva Eksponensial Risiko Berdasarkan Kematian")
-fig.update_layout(paper_bgcolor="#FFF0F2", plot_bgcolor="white")
+# Mengatur Tampilan Sudut Pandang Kamera Ruang 3D
+fig.update_layout(
+    margin=dict(l=0, r=0, b=0, t=0),
+    scene=dict(
+        xaxis=dict(title='Komponen Data', backgroundcolor="rgb(255, 242, 244)", gridcolor="white", showbackground=True),
+        yaxis=dict(title='Indeks Kedalaman', backgroundcolor="rgb(255, 242, 244)", gridcolor="white", showbackground=True),
+        zaxis=dict(title='Tingkat Risiko (Z)', backgroundcolor="rgb(255, 242, 244)", gridcolor="white", showbackground=True),
+        camera=dict(eye=dict(x=1.5, y=1.5, z=1.2)) # Sudut pandang awal 3D yang estetik
+    ),
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(0,0,0,0)'
+)
+
+# Tampilkan grafik 3D di Streamlit
 st.plotly_chart(fig, use_container_width=True)
+
+st.info("💡 Tips Dosen: Gunakan jarimu (di HP) atau klik kanan mouse (di Laptop) lalu geser untuk memutar grafik 3D ini ke segala arah!")
